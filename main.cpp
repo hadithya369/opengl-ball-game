@@ -13,6 +13,7 @@ int gamenotstarted=1;
 bool batchange=0;
 int score=0;
 int allblocks=0;
+int allallblocks = 0;
 
 float timebonus=10000;
 
@@ -37,13 +38,24 @@ float min(float a,float b){
 }
 
 void myinit(){
-    glClearColor(1,1,1,1);
+    glClearColor(0,0,0,1);
     gluOrtho2D(0,800,0,600);
     for(int i=0;i<blockx;i++)
         for(int j=0;j<blocky;j++)
             blockarray[i][j]=1;
     specialx=rand()%10;
     specialy=rand()%5;
+}
+
+void drawdiamond(int x, int y){
+    glColor3f(rand()%100/100.0,rand()%100/100.0,rand()%100/100.0);
+    int tmp = 10;
+    glBegin(GL_POLYGON);
+        glVertex2f(x,y+tmp);
+        glVertex2f(x+tmp,y);
+        glVertex2f(x,y-tmp);
+        glVertex2f(x-tmp,y);
+    glEnd();
 }
 
 void drawbat(){
@@ -79,7 +91,7 @@ void drawblocks(){
     for(int i=0;i<blockx;i++){
         for(int j=0;j<blocky;j++){
             if(i==specialx&&j==specialy&&blockarray[i][j]){
-                drawblock(i*blockwidth,j*blockheight+height/2,0,0,0);
+                drawblock(i*blockwidth,j*blockheight+height/2,1,1,1);
                 continue;
             }
             if(blockarray[i][j])
@@ -173,7 +185,7 @@ void moveball(){
 }
 
 void drawball(){
-    glColor3f(0,0,1);
+    glColor3f(0,1,0);
     glBegin(GL_POLYGON);
     float thet=0.0;
         for(int i=0;i<360;i+=20){
@@ -186,6 +198,7 @@ void drawball(){
 void drawscore(){
     glRasterPos2f(9,70);
     char str[20];
+    score = (int)(min(score, 35792));
     sprintf(str,"Score: %05d",score);
     for(int i=0;str[i]!=0;i++)
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,str[i]);
@@ -210,36 +223,56 @@ void prinString(float x,float y,void *font,char *string) {
 }
 
 void continue_game(){
-        drawbat();
-        moveball();
-        drawblocks();
-        drawball();
-        drawscore();
+    if(is_all_done()){
+        gameover = 1;
+        return;
+    }
+    drawbat();
+    moveball();
+    drawblocks();
+    drawball();
+    drawscore();
 }
 
 void start_game(){
+    int gap = 40;
+    drawdiamond(gap,gap);
+    drawdiamond(gap,600-gap);
+    drawdiamond(800-gap,gap);
+    drawdiamond(800-gap,600-gap);
     char str[100];
-		strcpy(str,"DX-BALL");
-        glColor3f(1,0,0);
-		prinString(350,500,GLUT_BITMAP_HELVETICA_18,str);
-		strcpy(str,"Menu");
-		prinString(300,450,GLUT_BITMAP_HELVETICA_18,str);
-		strcpy(str,"S Start Game");
-		prinString(290,430,GLUT_BITMAP_HELVETICA_18,str);
-		strcpy(str,"Q Quit");
-		prinString(290,410,GLUT_BITMAP_HELVETICA_18,str);
+    strcpy(str,"DX-BALL");
+    glColor3f(1,0,0);
+    prinString(350,500,GLUT_BITMAP_HELVETICA_18,str);
+    strcpy(str,"Menu");
+    prinString(330+40,450-50,GLUT_BITMAP_HELVETICA_18,str);
+    strcpy(str,"S Start Game");
+    prinString(290+40,430-50,GLUT_BITMAP_HELVETICA_18,str);
+    strcpy(str,"Q Quit");
+    prinString(290+40,410-50,GLUT_BITMAP_HELVETICA_18,str);
+
+        
 }
 
 void game_over(){
+    int gap = 40;
+    drawdiamond(gap,gap);
+    drawdiamond(gap,600-gap);
+    drawdiamond(800-gap,gap);
+    drawdiamond(800-gap,600-gap);
     char str[100];
         glColor3f(1,0,0);
 		strcpy(str,"Game Over");
-		prinString(350,500,GLUT_BITMAP_HELVETICA_18,str);
-        score=is_all_done()?score+(int)timebonus:score;
+		prinString(340,500,GLUT_BITMAP_HELVETICA_18,str);
+        if(!allallblocks){
+            score=is_all_done()?score+(int)timebonus:score;
+            allallblocks = 1;
+        }
+        
         sprintf(str,"Score: %d",score);
-		prinString(300,450,GLUT_BITMAP_HELVETICA_18,str);
+		prinString(340,450-50,GLUT_BITMAP_HELVETICA_18,str);
 		strcpy(str,"Q Quit Game");
-		prinString(290,430,GLUT_BITMAP_HELVETICA_18,str);
+		prinString(340,430-50,GLUT_BITMAP_HELVETICA_18,str);
 }
 
 void mydisplay(){
@@ -277,6 +310,30 @@ void keyboardfunc(unsigned char key,int x,int y){
     }
 }
 
+void changeSize(int w, int h) {
+
+	// Prevent a divide by zero, when window is too short
+	// (you cant make a window of zero width).
+	// if(h == 0)
+	// 	h = 1;
+	// float ratio = 1.0* w / h;
+
+	// // Use the Projection Matrix
+	// glMatrixMode(GL_PROJECTION);
+
+    //     // Reset Matrix
+	// glLoadIdentity();
+
+	// Set the viewport to be the entire window
+	glViewport(0, (h-height), width, height);
+
+	// Set the correct perspective.
+	// gluPerspective(45,ratio,1,1000);
+
+	// Get Back to the Modelview
+	// glMatrixMode(GL_MODELVIEW);
+}
+
 int main(int argc,char *argv[]){
     srand(time(0));
     glutInit(&argc,argv);
@@ -287,6 +344,7 @@ int main(int argc,char *argv[]){
     glutDisplayFunc(mydisplay);
     glutPassiveMotionFunc(motionfunc);
     glutKeyboardFunc(keyboardfunc);
+    glutReshapeFunc(changeSize);
     myinit();
     glutMainLoop();
 }
