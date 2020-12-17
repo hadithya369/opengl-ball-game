@@ -240,16 +240,20 @@ void start_game(){
     drawdiamond(gap,600-gap);
     drawdiamond(800-gap,gap);
     drawdiamond(800-gap,600-gap);
+    drawdiamond(320,506);
+    drawdiamond(455,506);
     char str[100];
-    strcpy(str,"DX-BALL");
     glColor3f(1,0,0);
+    strcpy(str,"DX-BALL");
     prinString(350,500,GLUT_BITMAP_HELVETICA_18,str);
+    glColor3f(1,0,1);
     strcpy(str,"Menu");
     prinString(330+40,450-50,GLUT_BITMAP_HELVETICA_18,str);
-    strcpy(str,"S Start Game");
-    prinString(290+40,430-50,GLUT_BITMAP_HELVETICA_18,str);
-    strcpy(str,"Q Quit");
+    glColor3f(0,0,1);
+    strcpy(str,"S   Start Game");
     prinString(290+40,410-50,GLUT_BITMAP_HELVETICA_18,str);
+    strcpy(str,"Q      Quit");
+    prinString(290+40,380-50,GLUT_BITMAP_HELVETICA_18,str);
 
         
 }
@@ -260,19 +264,22 @@ void game_over(){
     drawdiamond(gap,600-gap);
     drawdiamond(800-gap,gap);
     drawdiamond(800-gap,600-gap);
+    drawdiamond(320,506);
+    drawdiamond(470,506);
     char str[100];
         glColor3f(1,0,0);
 		strcpy(str,"Game Over");
-		prinString(340,500,GLUT_BITMAP_HELVETICA_18,str);
+		prinString(350,500,GLUT_BITMAP_HELVETICA_18,str);
         if(!allallblocks){
             score=is_all_done()?score+(int)timebonus:score;
             allallblocks = 1;
         }
-        
+        glColor3f(0,1,1);
         sprintf(str,"Score: %d",score);
-		prinString(340,450-50,GLUT_BITMAP_HELVETICA_18,str);
+		prinString(355,460-50,GLUT_BITMAP_HELVETICA_18,str);
+        glColor3f(0,0,1);
 		strcpy(str,"Q Quit Game");
-		prinString(340,430-50,GLUT_BITMAP_HELVETICA_18,str);
+		prinString(345,400-50,GLUT_BITMAP_HELVETICA_18,str);
 }
 
 void mydisplay(){
