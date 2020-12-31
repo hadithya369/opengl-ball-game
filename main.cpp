@@ -129,9 +129,9 @@ void bat_check(){
         else
             ballspeedx-=batspeed;
     }
-    if(ballspeedx>8)
+    if(ballspeedx>4)
         ballspeedx-=1;
-    if(ballspeedy>8)
+    if(ballspeedy>4)
         ballspeedy-=1;
 }
 
@@ -341,6 +341,11 @@ void changeSize(int w, int h) {
 	// glMatrixMode(GL_MODELVIEW);
 }
 
+void ballSize(int button,int state,int x,int y){
+    if(button==GLUT_RIGHT_BUTTON && state==GLUT_DOWN)
+        ball_radius=max(4,((int)ball_radius+4)%22);
+}
+
 int main(int argc,char *argv[]){
     srand(time(0));
     glutInit(&argc,argv);
@@ -352,6 +357,7 @@ int main(int argc,char *argv[]){
     glutPassiveMotionFunc(motionfunc);
     glutKeyboardFunc(keyboardfunc);
     glutReshapeFunc(changeSize);
+    glutMouseFunc(ballSize);
     myinit();
     glutMainLoop();
 }
